@@ -1,0 +1,11 @@
+bin/
+bin-Debug/
+bin-Release/
+obj/
+.vs/
+*.filters
+*.user
+
+book/
+src/
+
