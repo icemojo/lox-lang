@@ -169,6 +169,27 @@ Scanner::scan_token()
         add_token(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
     } break;
 
+    case '/': {
+        if (match('/')) {
+            while (peek() != '\n' && !is_end()) {
+                [[maybe_unused]] char _ = advance();
+            }
+        }
+        else {
+            add_token(TokenType::SLASH);
+        }
+    } break;
+
+    case ' ':
+    case '\r':
+    case '\t':
+        // Ignore general whitespaces
+        break;
+
+    case '\n':
+        line += 1;
+        break;
+
     default:
         // TODO(yemon): Do some sort of tokenization error reporting,
         // on an "invalid/unidentified" character.
@@ -181,6 +202,19 @@ Scanner::advance()
 {
     try {
         return source.at(current++);
+    }
+    catch (const std::out_of_range &) {
+        // TODO(yemon): Return some sort of empty or invalid result
+        return '\0';
+    }
+}
+
+[[nodiscard]] char 
+Scanner::peek()
+{
+    if (is_end()) return '\0';
+    try {
+        return source.at(current);
     }
     catch (const std::out_of_range &) {
         // TODO(yemon): Return some sort of empty or invalid result

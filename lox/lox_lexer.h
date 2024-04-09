@@ -123,6 +123,8 @@ private:
 
     [[nodiscard]] char advance();
 
+    [[nodiscard]] char peek();
+
     [[nodiscard]] bool match(char expected);
 
     void add_token(const TokenType &type);
