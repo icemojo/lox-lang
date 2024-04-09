@@ -198,6 +198,9 @@ Scanner::scan_token()
         if (std::isdigit(next_ch)) {
             tokenize_number();
         }
+        else if (std::isalpha(next_ch)) {
+            tokenize_identifier();
+        }
         else {
             // TODO(yemon): Do some sort of tokenization error reporting,
             // on an "invalid/unidentified" character.
@@ -319,9 +322,35 @@ Scanner::tokenize_number()
     add_token(TokenType::NUMBER, number);
 }
 
+void 
+Scanner::tokenize_identifier()
+{
+    char peek_ch = peek();
+    while (is_alpha(peek_ch) || std::isdigit(peek_ch)) {
+        [[maybe_unused]] char _ = advance();
+    }
+
+    string identifier = source.substr(start, current);
+    if (const auto search_it = KEYWORDS.find(string_view{ identifier }); 
+        search_it != KEYWORDS.end()) {
+        const TokenType token_type = search_it->second;
+        add_token(token_type);
+    }
+    else {
+        // TODO(yemon): Don't we need the identifier's name itself as well?
+        add_token(TokenType::IDENTIFIER);
+    }
+}
+
 [[nodiscard]] bool
 Scanner::is_end() const
 {
     return current >= source.size();
+}
+
+[[nodiscard]] bool 
+is_alpha(const char c)
+{
+    return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_');
 }
 

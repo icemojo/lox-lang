@@ -3,10 +3,12 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 using std::string;
 using std::string_view;
 using std::vector;
+using std::unordered_map;
 
 enum class TokenType {
     EOL = 0,
@@ -56,11 +58,33 @@ enum class TokenType {
     NIL,
     PRINT,
     SUPER,
-    THIS
+    THIS,
+
+    INVALID,
 };
 
 [[nodiscard]] string
 TokenTypeToString(const TokenType &type);
+
+inline const unordered_map<string_view, TokenType>
+KEYWORDS = {
+    {"class", TokenType::CLASS},
+    {"fun", TokenType::FUNCTION},
+    {"if", TokenType::IF},
+    {"else", TokenType::ELSE},
+    {"true", TokenType::TRUE},
+    {"false", TokenType::FALSE},
+    {"for", TokenType::FOR},
+    {"nil", TokenType::NIL},
+    {"and", TokenType::AND},
+    {"or", TokenType::OR},
+    {"print", TokenType::PRINT},
+    {"return", TokenType::RETURN},
+    {"super", TokenType::SUPER},
+    {"this", TokenType::THIS},
+    {"var", TokenType::VAR},
+    {"while", TokenType::WHILE},
+};
 
 //------------------------------------------------------------------------------
 
@@ -137,8 +161,12 @@ private:
 
     void tokenize_number();
 
+    void tokenize_identifier();
+
     [[nodiscard]] bool is_end() const;
 
 };
+
+[[nodiscard]] bool is_alpha(const char c);
 
 #endif  // LOX_PARSER_
