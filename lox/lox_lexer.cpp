@@ -180,6 +180,10 @@ Scanner::scan_token()
         }
     } break;
 
+    case '"': {
+        tokenize_string();
+    } break;
+
     case ' ':
     case '\r':
     case '\t':
@@ -190,10 +194,15 @@ Scanner::scan_token()
         line += 1;
         break;
 
-    default:
-        // TODO(yemon): Do some sort of tokenization error reporting,
-        // on an "invalid/unidentified" character.
-        break;
+    default: {
+        if (std::isdigit(next_ch)) {
+            tokenize_number();
+        }
+        else {
+            // TODO(yemon): Do some sort of tokenization error reporting,
+            // on an "invalid/unidentified" character.
+        }
+    } break;
     }
 }
 
@@ -215,6 +224,21 @@ Scanner::peek()
     if (is_end()) return '\0';
     try {
         return source.at(current);
+    }
+    catch (const std::out_of_range &) {
+        // TODO(yemon): Return some sort of empty or invalid result
+        return '\0';
+    }
+}
+
+[[nodiscard]] char 
+Scanner::peek_next()
+{
+    if (is_end() || current + 1 >= source.size()) {
+        return '\0';
+    }
+    try {
+        return source.at(current + 1);
     }
     catch (const std::out_of_range &) {
         // TODO(yemon): Return some sort of empty or invalid result
@@ -244,6 +268,55 @@ Scanner::add_token(const TokenType &type, const string &literal)
     string text = source.substr(start, current);
     Token new_token{ type, text, { literal }, line };
     tokens.push_back(new_token);
+}
+
+void
+Scanner::tokenize_string()
+{
+    while (peek() != '"' && !is_end()) {
+        // Supporting the multi-line string literals
+        if (peek() == '\n') {
+            line += 1;
+        }
+        [[maybe_unused]] char _ = advance();
+    }
+
+    if (is_end()) {
+        // TODO(yemon): Report invalid string composition error
+        return;
+    }
+
+    // Mark the closing '"'
+    [[maybe_unused]] char _ = advance();
+
+    // Trim the start and end quotes
+    string literal = source.substr(start + 1, current - 1);
+    add_token(TokenType::STRING, literal);
+}
+
+void
+Scanner::tokenize_number()
+{
+    while (std::isdigit(peek())) {
+        [[maybe_unused]] char _ = advance();
+    }
+
+    // Detect the fractional point '.'
+    if (peek() == '.' && std::isdigit(peek_next())) {
+        // Consume the '.'
+        [[maybe_unused]] char _ = advance();
+
+        // Consume the rest of the digits
+        while (std::isdigit(peek())) {
+            [[maybe_unused]] char _ = advance();
+        }
+    }
+
+    // TODO(yemon): Only tokenizing the literal number value as string for now. 
+    // Might want to specially parse it into their respective numeric types 
+    // (double, int) later on.
+    string number{ source.substr(start, current) };
+    add_token(TokenType::NUMBER, number);
 }
 
 [[nodiscard]] bool

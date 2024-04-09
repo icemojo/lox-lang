@@ -125,11 +125,17 @@ private:
 
     [[nodiscard]] char peek();
 
+    [[nodiscard]] char peek_next();
+
     [[nodiscard]] bool match(char expected);
 
     void add_token(const TokenType &type);
 
     void add_token(const TokenType &type, const string &literal);
+
+    void tokenize_string();
+
+    void tokenize_number();
 
     [[nodiscard]] bool is_end() const;
 
