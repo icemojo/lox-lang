@@ -113,21 +113,7 @@ private:
 
 class Scanner {
 public:
-    Scanner(const char *source) : 
-        source(source),
-        start(0),
-        current(0),
-        line(0)
-    {}
-
     Scanner(const string_view &source) : 
-        source(source),
-        start(0),
-        current(0),
-        line(0)
-    {}
-
-    Scanner(const string &source) : 
         source(source),
         start(0),
         current(0),
