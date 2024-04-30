@@ -90,7 +90,12 @@ KEYWORDS = {
 
 class Token {
 public:
-    Token() : type(TokenType::INVALID), line(0) {}
+    Token() : 
+        type(TokenType::INVALID), 
+        lexeme(""),
+        literal(""),
+        line(0) 
+    {}
     Token(
         const TokenType type, 
         const string &lexeme, 
@@ -98,6 +103,8 @@ public:
         const uint32_t line
     ) :
         type(type),
+        lexeme(lexeme),
+        literal(literal),
         line(line)
     {}
 

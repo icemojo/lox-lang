@@ -1,6 +1,7 @@
 #include <iostream>
 #include <format>
 #include "lox_options.h"
+#include "lox_ast.h"
 
 
 static const std::string_view PROMPT = ">> ";
@@ -72,6 +73,9 @@ ReportError(const int32_t line, const std::string_view &where, const std::string
 
 int main(int argc, char **argv)
 {
+    test2();
+    return 0;
+
     Options options = ParseOptions(argc, argv);
 
     if (options.repl_start) {

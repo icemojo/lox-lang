@@ -23,7 +23,7 @@ struct BinaryExpr {
     BinaryExpr() : optr(Token{}) {}
     BinaryExpr(std::unique_ptr<Expr> left, Token optr, std::unique_ptr<Expr> right) : 
         left(std::move(left)),
-        optr(Token{}),
+        optr(optr),
         right(std::move(right))
     {}
 };
@@ -94,5 +94,8 @@ struct PrintVisitor {
         std::cout << ")";
     }
 };
+
+void test();
+void test2();
 
 #endif  // LOX_AST_
