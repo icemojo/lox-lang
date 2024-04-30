@@ -3,66 +3,79 @@
 
 #include <string.h>
 #include <variant>
+#include <memory>
 #include "lox_lexer.h"
 
-using string = std::string;
-using string_view = std::string_view;
+struct BinaryExpr;
+struct Grouping;
+struct Literal;
+struct Unary;
 
-struct ExprVisitor;
+using Expr = std::variant<BinaryExpr, Grouping, Literal, Unary>;
 
-struct Expr {
-    virtual void accept(const ExprVisitor &visitor);
-};
-
-struct BinaryExpr : Expr {
-    Expr left;
+struct BinaryExpr {
+    std::unique_ptr<Expr> left;
     Token optr;
-    Expr right;
+    std::unique_ptr<Expr> right;
 
-    BinaryExpr(Expr left, Token optr, Expr right) :
-        left(left), optr(optr), right(right) 
-    {}
-
-    void accept(const ExprVisitor &visitor) override;
+    //BinaryExpr(Expr left, Token optr, Expr right) :
+    //    left(left), optr(optr), right(right) 
+    //{}
 };
 
-struct Grouping : Expr {
-    Expr expression;
+struct Grouping {
+    std::unique_ptr<Expr> expr;
     
-    Grouping(Expr expression) : expression(expression) {}
-
-    void accept(const ExprVisitor &visitor) override;
+    //Grouping(Expr expr) : expr(expr) {}
 };
 
-struct Literal : Expr {
+struct Literal {
     // NOTE(yemon): This *should* probably be a generic Object type
     std::string value;
 
-    Literal(string_view value) : value(value) {}
+    //Literal(std::string_view value) : value(value) {}
 };
 
-struct Unary : Expr {
+struct Unary {
     Token optr;
-    Expr right;
+    std::unique_ptr<Expr> right;
 
-    Unary(Token optr, Expr right) : optr(optr), right(right) {}
+    //Unary(Token optr, Expr right) : optr(optr), right(right) {}
 };
 
 //--------------------------------------------------------------------------------
 
-struct ExprVisitor {
-    virtual ~ExprVisitor() = default;
-    virtual void visit(const BinaryExpr &expr) const = 0;
-    virtual void visit(const Grouping &group) const = 0;
-    virtual void visit(const Literal &literal) const = 0;
-    virtual void visit(const Unary &unary) const = 0;
+struct ParseVisitor {
+    void operator()(const BinaryExpr &binary) const {
+        // do stuff on the binary expr
+    }
+
+    void operator()(const Grouping &group) const {
+        // do stuff on the expr group
+    }
+
+    void operator()(const Literal &literal) const { 
+        // do stuff on the literal value
+    }
+
+    void operator()(const Unary &unary) const {
+        // do stuff on the unary operator
+    }
 };
 
-struct Parser : ExprVisitor {
-    void visit(const BinaryExpr &expr) const override;
-    void visit(const Grouping &group) const override;
-    void visit(const Literal &literal) const override;
-    void visit(const Unary &unary) const override;
-};
+void test()
+{
+    Expr binary = BinaryExpr{ 
+        //.optr = Token{ TokenType::PLUS, "+", "+", 0 }
+    };
+    std::visit(ParseVisitor{}, binary);
 
-#endif
+    Expr grouping = Grouping{};
+    std::visit(ParseVisitor{}, grouping);
+
+    Expr literal = Literal{ "2002" };
+    std::visit(ParseVisitor{}, literal);
+
+}
+
+#endif  // LOX_AST_

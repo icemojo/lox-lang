@@ -90,6 +90,7 @@ KEYWORDS = {
 
 class Token {
 public:
+    Token() : type(TokenType::INVALID), line(0) {}
     Token(
         const TokenType type, 
         const string &lexeme, 
