@@ -101,11 +101,12 @@ public:
         line(line)
     {}
 
+    string lexeme;
+
     string to_string() const;
 
 private:
     TokenType type;
-    string lexeme;
     string literal;
     uint32_t line;
 };
