@@ -129,11 +129,12 @@ public:
         line(0)
     {}
 
+    vector<Token> tokens;
+
     void scan_tokens();
 
 private:
     string source;
-    vector<Token> tokens;
     size_t start;
     size_t current;
     uint32_t line;

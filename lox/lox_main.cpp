@@ -1,6 +1,7 @@
 #include <iostream>
 #include <format>
 #include "lox_options.h"
+#include "lox_lexer.h"
 #include "lox_ast.h"
 
 
@@ -60,6 +61,12 @@ static void
 Run(const std::string_view &source)
 {
     // TODO(yemon): initialize lexer-parser toolchain with the input text
+    Scanner scanner{ source };
+    scanner.scan_tokens();
+
+    for (auto const &token : scanner.tokens) {
+        std::cout << token.to_string() << '\n';
+    }
 }
 
 static void
@@ -73,8 +80,8 @@ ReportError(const int32_t line, const std::string_view &where, const std::string
 
 int main(int argc, char **argv)
 {
-    test2();
-    return 0;
+    //test2();
+    //return 0;
 
     Options options = ParseOptions(argc, argv);
 

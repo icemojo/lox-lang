@@ -40,6 +40,111 @@ make_unary(Token const optr, ExprPtr right)
 
 //------------------------------------------------------------------------------
 
+void 
+ParseVisitor::operator()(BinaryExpr const &binary) const
+{
+}
+
+void 
+ParseVisitor::operator()(Grouping const &group) const
+{
+}
+
+void 
+ParseVisitor::operator()(Literal const &literal) const
+{
+}
+
+void 
+ParseVisitor::operator()(Unary const &unary) const
+{
+}
+
+ExprPtr 
+CopyVisitor::operator()(BinaryExpr const &binary) const 
+{
+    auto new_binary = make_binary_expr(
+        std::move(std::visit(CopyVisitor{}, *(binary.left))),
+        binary.optr,
+        std::move(std::visit(CopyVisitor{}, *(binary.right)))
+    );
+    return new_binary;
+}
+
+ExprPtr 
+CopyVisitor::operator()(Grouping const &group) const 
+{
+    auto new_group = make_grouping(
+        std::move(std::visit(CopyVisitor{}, *(group.expr)))
+    );
+    return new_group;
+}
+
+ExprPtr 
+CopyVisitor::operator()(Literal const &literal) const 
+{
+    auto new_literal = make_literal(literal.value);
+    return new_literal;
+}
+
+ExprPtr
+CopyVisitor::operator()(Unary const &unary) const 
+{
+    auto new_unary = make_unary(
+        unary.optr,
+        std::move(std::visit(CopyVisitor{}, *(unary.right)))
+    );
+    return std::move(new_unary);
+}
+
+void 
+PrintVisitor::operator()(BinaryExpr const &binary) const
+{
+    std::cout << "(" << binary.optr.lexeme << " ";
+    std::visit(PrintVisitor{}, *(binary.left));
+    std::cout << " ";
+    std::visit(PrintVisitor{}, *(binary.right));
+    std::cout << ")";
+    if (line_break) {
+        std::cout << '\n';
+    }
+}
+
+void 
+PrintVisitor::operator()(Grouping const &group) const 
+{
+    std::cout << "(";
+    std::visit(PrintVisitor{}, *(group.expr));
+    std::cout << ")";
+    if (line_break) {
+        std::cout << '\n';
+    }
+}
+
+void 
+PrintVisitor::operator()(Literal const &literal) const 
+{
+    std::cout << literal.value;
+    if (line_break) {
+        std::cout << '\n';
+    }
+}
+
+void 
+PrintVisitor::operator()(Unary const &unary) const 
+{
+    std::cout << "(" << unary.optr.lexeme << " ";
+    if (unary.right) {
+        std::visit(PrintVisitor{}, *(unary.right));
+    }
+    std::cout << ")";
+    if (line_break) {
+        std::cout << '\n';
+    }
+}
+
+//------------------------------------------------------------------------------
+
 void test()
 {
     Expr binary = BinaryExpr{

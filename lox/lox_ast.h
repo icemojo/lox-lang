@@ -66,48 +66,23 @@ ExprPtr make_unary(Token const optr, ExprPtr right);
 //------------------------------------------------------------------------------
 
 struct ParseVisitor {
-    void operator()(BinaryExpr const &binary) const {
-    }
+    void operator()(BinaryExpr const &binary) const;
 
-    void operator()(Grouping const &group) const {
-    }
+    void operator()(Grouping const &group) const;
 
-    void operator()(Literal const &literal) const { 
-    }
+    void operator()(Literal const &literal) const;
 
-    void operator()(Unary const &unary) const {
-    }
+    void operator()(Unary const &unary) const;
 };
 
 struct CopyVisitor {
-    ExprPtr operator()(BinaryExpr const &binary) const {
-        auto new_binary = make_binary_expr(
-            std::move(std::visit(CopyVisitor{}, *(binary.left))),
-            binary.optr,
-            std::move(std::visit(CopyVisitor{}, *(binary.right)))
-        );
-        return new_binary;
-    }
+    ExprPtr operator()(BinaryExpr const &binary) const;
 
-    ExprPtr operator()(Grouping const &group) const {
-        auto new_group = make_grouping(
-            std::move(std::visit(CopyVisitor{}, *(group.expr)))
-        );
-        return new_group;
-    }
+    ExprPtr operator()(Grouping const &group) const;
 
-    ExprPtr operator()(Literal const &literal) const { 
-        auto new_literal = make_literal(literal.value);
-        return new_literal;
-    }
+    ExprPtr operator()(Literal const &literal) const;
 
-    ExprPtr operator()(Unary const &unary) const {
-        auto new_unary = make_unary(
-            unary.optr,
-            std::move(std::visit(CopyVisitor{}, *(unary.right)))
-        );
-        return std::move(new_unary);
-    }
+    ExprPtr operator()(Unary const &unary) const;
 };
 
 struct PrintVisitor {
@@ -116,43 +91,13 @@ struct PrintVisitor {
     PrintVisitor() : line_break(false) {}
     PrintVisitor(bool line_break) : line_break(line_break) {}
 
-    void operator()(BinaryExpr const &binary) const {
-        std::cout << "(" << binary.optr.lexeme << " ";
-        std::visit(PrintVisitor{}, *(binary.left));
-        std::cout << " ";
-        std::visit(PrintVisitor{}, *(binary.right));
-        std::cout << ")";
-        if (line_break) {
-            std::cout << '\n';
-        }
-    }
+    void operator()(BinaryExpr const &binary) const;
 
-    void operator()(Grouping const &group) const {
-        std::cout << "(";
-        std::visit(PrintVisitor{}, *(group.expr));
-        std::cout << ")";
-        if (line_break) {
-            std::cout << '\n';
-        }
-    }
+    void operator()(Grouping const &group) const;
 
-    void operator()(Literal const &literal) const {
-        std::cout << literal.value;
-        if (line_break) {
-            std::cout << '\n';
-        }
-    }
+    void operator()(Literal const &literal) const;
 
-    void operator()(Unary const &unary) const {
-        std::cout << "(" << unary.optr.lexeme << " ";
-        if (unary.right) {
-            std::visit(PrintVisitor{}, *(unary.right));
-        }
-        std::cout << ")";
-        if (line_break) {
-            std::cout << '\n';
-        }
-    }
+    void operator()(Unary const &unary) const;
 };
 
 //------------------------------------------------------------------------------
