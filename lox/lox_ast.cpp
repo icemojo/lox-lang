@@ -2,7 +2,7 @@
 #include "lox_ast.h"
 
 ExprPtr 
-make_binary_expr(ExprPtr left, Token const optr, ExprPtr right)
+make_binary_expr(ExprPtr left, const Token optr, ExprPtr right)
 {
     auto binary = std::make_unique<Expr>(BinaryExpr{
         std::move(left),
@@ -22,14 +22,14 @@ make_grouping(ExprPtr expr)
 }
 
 ExprPtr
-make_literal(std::string const &value) 
+make_literal(const string &value) 
 {
     auto literal = std::make_unique<Expr>(Literal{ value });
     return std::move(literal);
 }
 
 ExprPtr 
-make_unary(Token const optr, ExprPtr right)
+make_unary(const Token optr, ExprPtr right)
 {
     auto unary = std::make_unique<Expr>(Unary{
         optr,
@@ -41,27 +41,27 @@ make_unary(Token const optr, ExprPtr right)
 //------------------------------------------------------------------------------
 
 void 
-ParseVisitor::operator()(BinaryExpr const &binary) const
+ParseVisitor::operator()(const BinaryExpr &binary) const
 {
 }
 
 void 
-ParseVisitor::operator()(Grouping const &group) const
+ParseVisitor::operator()(const Grouping &group) const
 {
 }
 
 void 
-ParseVisitor::operator()(Literal const &literal) const
+ParseVisitor::operator()(const Literal &literal) const
 {
 }
 
 void 
-ParseVisitor::operator()(Unary const &unary) const
+ParseVisitor::operator()(const Unary &unary) const
 {
 }
 
 ExprPtr 
-CopyVisitor::operator()(BinaryExpr const &binary) const 
+CopyVisitor::operator()(const BinaryExpr &binary) const 
 {
     auto new_binary = make_binary_expr(
         std::move(std::visit(CopyVisitor{}, *(binary.left))),
@@ -72,7 +72,7 @@ CopyVisitor::operator()(BinaryExpr const &binary) const
 }
 
 ExprPtr 
-CopyVisitor::operator()(Grouping const &group) const 
+CopyVisitor::operator()(const Grouping &group) const 
 {
     auto new_group = make_grouping(
         std::move(std::visit(CopyVisitor{}, *(group.expr)))
@@ -81,14 +81,14 @@ CopyVisitor::operator()(Grouping const &group) const
 }
 
 ExprPtr 
-CopyVisitor::operator()(Literal const &literal) const 
+CopyVisitor::operator()(const Literal &literal) const 
 {
     auto new_literal = make_literal(literal.value);
     return new_literal;
 }
 
 ExprPtr
-CopyVisitor::operator()(Unary const &unary) const 
+CopyVisitor::operator()(const Unary &unary) const 
 {
     auto new_unary = make_unary(
         unary.optr,
@@ -98,7 +98,7 @@ CopyVisitor::operator()(Unary const &unary) const
 }
 
 void 
-PrintVisitor::operator()(BinaryExpr const &binary) const
+PrintVisitor::operator()(const BinaryExpr &binary) const
 {
     std::cout << "(" << binary.optr.lexeme << " ";
     std::visit(PrintVisitor{}, *(binary.left));
@@ -111,7 +111,7 @@ PrintVisitor::operator()(BinaryExpr const &binary) const
 }
 
 void 
-PrintVisitor::operator()(Grouping const &group) const 
+PrintVisitor::operator()(const Grouping &group) const 
 {
     std::cout << "(";
     std::visit(PrintVisitor{}, *(group.expr));
@@ -122,7 +122,7 @@ PrintVisitor::operator()(Grouping const &group) const
 }
 
 void 
-PrintVisitor::operator()(Literal const &literal) const 
+PrintVisitor::operator()(const Literal &literal) const 
 {
     std::cout << literal.value;
     if (line_break) {
@@ -131,7 +131,7 @@ PrintVisitor::operator()(Literal const &literal) const
 }
 
 void 
-PrintVisitor::operator()(Unary const &unary) const 
+PrintVisitor::operator()(const Unary &unary) const 
 {
     std::cout << "(" << unary.optr.lexeme << " ";
     if (unary.right) {

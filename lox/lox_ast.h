@@ -8,6 +8,10 @@
 #include <memory>
 #include "lox_lexer.h"
 
+using std::vector;
+using std::string;
+using std::string_view;
+
 struct BinaryExpr;
 struct Grouping;
 struct Literal;
@@ -37,10 +41,10 @@ struct Grouping {
 };
 
 struct Literal {
-    std::string value;  // NOTE(yemon): This *should* probably be a generic Object type... probably
+    string value;  // NOTE(yemon): This *should* probably be a generic Object type... probably
 
     Literal() : value("") {}
-    Literal(std::string_view value) : value(value) {}
+    Literal(string_view value) : value(value) {}
 };
 
 struct Unary {
@@ -55,34 +59,34 @@ struct Unary {
     {}
 };
 
-ExprPtr make_binary_expr(ExprPtr left, Token const optr, ExprPtr right);
+ExprPtr make_binary_expr(ExprPtr left, const Token optr, ExprPtr right);
 
 ExprPtr make_grouping(ExprPtr expr);
 
-ExprPtr make_literal(std::string const &value);
+ExprPtr make_literal(const string &value);
 
-ExprPtr make_unary(Token const optr, ExprPtr right);
+ExprPtr make_unary(const Token optr, ExprPtr right);
 
 //------------------------------------------------------------------------------
 
 struct ParseVisitor {
-    void operator()(BinaryExpr const &binary) const;
+    void operator()(const BinaryExpr &binary) const;
 
-    void operator()(Grouping const &group) const;
+    void operator()(const Grouping &group) const;
 
-    void operator()(Literal const &literal) const;
+    void operator()(const Literal &literal) const;
 
-    void operator()(Unary const &unary) const;
+    void operator()(const Unary &unary) const;
 };
 
 struct CopyVisitor {
-    ExprPtr operator()(BinaryExpr const &binary) const;
+    ExprPtr operator()(const BinaryExpr &binary) const;
 
-    ExprPtr operator()(Grouping const &group) const;
+    ExprPtr operator()(const Grouping &group) const;
 
-    ExprPtr operator()(Literal const &literal) const;
+    ExprPtr operator()(const Literal &literal) const;
 
-    ExprPtr operator()(Unary const &unary) const;
+    ExprPtr operator()(const Unary &unary) const;
 };
 
 struct PrintVisitor {
@@ -91,13 +95,13 @@ struct PrintVisitor {
     PrintVisitor() : line_break(false) {}
     PrintVisitor(bool line_break) : line_break(line_break) {}
 
-    void operator()(BinaryExpr const &binary) const;
+    void operator()(const BinaryExpr &binary) const;
 
-    void operator()(Grouping const &group) const;
+    void operator()(const Grouping &group) const;
 
-    void operator()(Literal const &literal) const;
+    void operator()(const Literal &literal) const;
 
-    void operator()(Unary const &unary) const;
+    void operator()(const Unary &unary) const;
 };
 
 //------------------------------------------------------------------------------
