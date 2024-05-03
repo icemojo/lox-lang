@@ -41,69 +41,69 @@ make_unary(const Token optr, ExprPtr right)
 //------------------------------------------------------------------------------
 
 void 
-ParseVisitor::operator()(const BinaryExpr &binary) const
+Parser::operator()(const BinaryExpr &binary) const
 {
 }
 
 void 
-ParseVisitor::operator()(const Grouping &group) const
+Parser::operator()(const Grouping &group) const
 {
 }
 
 void 
-ParseVisitor::operator()(const Literal &literal) const
+Parser::operator()(const Literal &literal) const
 {
 }
 
 void 
-ParseVisitor::operator()(const Unary &unary) const
+Parser::operator()(const Unary &unary) const
 {
 }
 
 ExprPtr 
-CopyVisitor::operator()(const BinaryExpr &binary) const 
+Copier::operator()(const BinaryExpr &binary) const 
 {
     auto new_binary = make_binary_expr(
-        std::move(std::visit(CopyVisitor{}, *(binary.left))),
+        std::move(std::visit(Copier{}, *(binary.left))),
         binary.optr,
-        std::move(std::visit(CopyVisitor{}, *(binary.right)))
+        std::move(std::visit(Copier{}, *(binary.right)))
     );
     return new_binary;
 }
 
 ExprPtr 
-CopyVisitor::operator()(const Grouping &group) const 
+Copier::operator()(const Grouping &group) const 
 {
     auto new_group = make_grouping(
-        std::move(std::visit(CopyVisitor{}, *(group.expr)))
+        std::move(std::visit(Copier{}, *(group.expr)))
     );
     return new_group;
 }
 
 ExprPtr 
-CopyVisitor::operator()(const Literal &literal) const 
+Copier::operator()(const Literal &literal) const 
 {
     auto new_literal = make_literal(literal.value);
     return new_literal;
 }
 
 ExprPtr
-CopyVisitor::operator()(const Unary &unary) const 
+Copier::operator()(const Unary &unary) const 
 {
     auto new_unary = make_unary(
         unary.optr,
-        std::move(std::visit(CopyVisitor{}, *(unary.right)))
+        std::move(std::visit(Copier{}, *(unary.right)))
     );
     return std::move(new_unary);
 }
 
 void 
-PrintVisitor::operator()(const BinaryExpr &binary) const
+Printer::operator()(const BinaryExpr &binary) const
 {
     std::cout << "(" << binary.optr.lexeme << " ";
-    std::visit(PrintVisitor{}, *(binary.left));
+    std::visit(Printer{}, *(binary.left));
     std::cout << " ";
-    std::visit(PrintVisitor{}, *(binary.right));
+    std::visit(Printer{}, *(binary.right));
     std::cout << ")";
     if (line_break) {
         std::cout << '\n';
@@ -111,10 +111,10 @@ PrintVisitor::operator()(const BinaryExpr &binary) const
 }
 
 void 
-PrintVisitor::operator()(const Grouping &group) const 
+Printer::operator()(const Grouping &group) const 
 {
     std::cout << "(";
-    std::visit(PrintVisitor{}, *(group.expr));
+    std::visit(Printer{}, *(group.expr));
     std::cout << ")";
     if (line_break) {
         std::cout << '\n';
@@ -122,7 +122,7 @@ PrintVisitor::operator()(const Grouping &group) const
 }
 
 void 
-PrintVisitor::operator()(const Literal &literal) const 
+Printer::operator()(const Literal &literal) const 
 {
     std::cout << literal.value;
     if (line_break) {
@@ -131,11 +131,11 @@ PrintVisitor::operator()(const Literal &literal) const
 }
 
 void 
-PrintVisitor::operator()(const Unary &unary) const 
+Printer::operator()(const Unary &unary) const 
 {
     std::cout << "(" << unary.optr.lexeme << " ";
     if (unary.right) {
-        std::visit(PrintVisitor{}, *(unary.right));
+        std::visit(Printer{}, *(unary.right));
     }
     std::cout << ")";
     if (line_break) {
@@ -150,19 +150,19 @@ void test()
     Expr binary = BinaryExpr{
         //.optr = Token{ TokenType::PLUS, "+", "+", 0 }
     };
-    std::visit(ParseVisitor{}, binary);
+    std::visit(Parser{}, binary);
 
     Expr grouping = Grouping{};
-    std::visit(ParseVisitor{}, grouping);
+    std::visit(Parser{}, grouping);
 
     Expr literal = Literal{ "2002" };
-    std::visit(ParseVisitor{}, literal);
+    std::visit(Parser{}, literal);
 
     Expr unary = Unary{
         Token{ TokenType::MINUS, "-", "-", 1 },
         std::make_unique<Expr>(Literal{ "123" })
     };
-    std::visit(PrintVisitor{}, unary);
+    std::visit(Printer{}, unary);
 
 }
 
@@ -170,29 +170,29 @@ void test2()
 {
     // (- 123)
     ExprPtr lit1 = make_literal("123");
-    std::visit(PrintVisitor{ true }, *lit1);
+    std::visit(Printer{ true }, *lit1);
 
     ExprPtr left = make_unary(
         Token{ TokenType::MINUS, "-", "", 1 },
-        std::move(std::visit(CopyVisitor{}, *lit1))
+        std::move(std::visit(Copier{}, *lit1))
     );
-    std::visit(PrintVisitor{ true }, *left);
+    std::visit(Printer{ true }, *left);
 
     // (45.67)
     ExprPtr right = make_grouping(
         make_literal("45.67")
     );
-    std::visit(PrintVisitor{ true }, *right);
+    std::visit(Printer{ true }, *right);
 
     // (* (- 123) (45.67))
     ExprPtr expr = make_binary_expr(
-        std::move(std::visit(CopyVisitor{}, *left)),
+        std::move(std::visit(Copier{}, *left)),
         Token{ TokenType::STAR, "*", "", 1 },
-        std::move(std::visit(CopyVisitor{}, *right))
+        std::move(std::visit(Copier{}, *right))
     );
-    std::visit(PrintVisitor{ true }, *expr);
+    std::visit(Printer{ true }, *expr);
 
-    ExprPtr expr2 = std::move(std::visit(CopyVisitor{}, *expr));
-    std::visit(PrintVisitor{ true }, *expr2);
+    ExprPtr expr2 = std::move(std::visit(Copier{}, *expr));
+    std::visit(Printer{ true }, *expr2);
 }
 

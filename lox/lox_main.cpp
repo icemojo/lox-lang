@@ -13,7 +13,7 @@ inline bool should_quit = false;
 //------------------------------------------------------------------------------
 
 static void
-Run(const std::string_view &source);
+Run(const std::string_view &source, const Options &options);
 
 static void 
 ReplStart(const Options &options)
@@ -39,7 +39,7 @@ ReplStart(const Options &options)
             continue;
         }
 
-        Run(input_buffer);
+        Run(input_buffer, options);
 
         has_error = false;
         input_buffer.clear();
@@ -53,11 +53,11 @@ RunFile(const Options &options)
         return;
     }
 
-    Run(options.input_filename);
+    Run(options.input_filename, options);
 }
 
-static void 
-Run(const std::string_view &source)
+static void
+Run(const std::string_view &source, const Options &options)
 {
     // TODO(yemon): initialize lexer-parser toolchain with the input text
     Scanner scanner{ source };

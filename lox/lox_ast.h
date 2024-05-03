@@ -69,7 +69,7 @@ ExprPtr make_unary(const Token optr, ExprPtr right);
 
 //------------------------------------------------------------------------------
 
-struct ParseVisitor {
+struct Parser {
     void operator()(const BinaryExpr &binary) const;
 
     void operator()(const Grouping &group) const;
@@ -79,7 +79,7 @@ struct ParseVisitor {
     void operator()(const Unary &unary) const;
 };
 
-struct CopyVisitor {
+struct Copier {
     ExprPtr operator()(const BinaryExpr &binary) const;
 
     ExprPtr operator()(const Grouping &group) const;
@@ -89,11 +89,11 @@ struct CopyVisitor {
     ExprPtr operator()(const Unary &unary) const;
 };
 
-struct PrintVisitor {
+struct Printer {
     bool line_break;
 
-    PrintVisitor() : line_break(false) {}
-    PrintVisitor(bool line_break) : line_break(line_break) {}
+    Printer() : line_break(false) {}
+    Printer(bool line_break) : line_break(line_break) {}
 
     void operator()(const BinaryExpr &binary) const;
 

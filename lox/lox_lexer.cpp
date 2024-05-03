@@ -114,9 +114,9 @@ Token::to_string() const
     static_assert(std::is_same<decltype(literal), std::string>::value, "Type of member 'literal' is not std::string.");
 #endif
     if (literal.size() > 0) {
-        output += literal;
+        output += "\"" + literal + "\"";
     }
-    return token_type + " " + lexeme + " " + literal;
+    return output;
 }
 
 //------------------------------------------------------------------------------
