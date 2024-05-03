@@ -135,7 +135,7 @@ Scanner::scan_tokens()
         scan_token();
     }
 
-    tokens.push_back(Token{ TokenType::EOF_, "", "", 0 });
+    add_token(TokenType::EOF_, "", "");
 }
 
 void 
@@ -178,24 +178,28 @@ Scanner::scan_token()
         const TokenType type = match_next('=') ? TokenType::BANG_EQUAL : TokenType::BANG;
         const string_view lexeme = match_next('=') ? "!=" : "!";
         add_token(type, lexeme, "");
+        [[maybe_unused]] char _ = advance();
     } break;
 
     case '=': {
         const TokenType type = match_next('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL;
         const string_view lexeme = match_next('=') ? "==" : "=";
         add_token(type, lexeme, "");
+        [[maybe_unused]] char _ = advance();
     } break;
 
     case '<': {
         const TokenType type = match_next('=') ? TokenType::LESS_EQUAL : TokenType::LESS;
-        const string_view lexeme = match_next('=') ? "<=" : "=";
+        const string_view lexeme = match_next('=') ? "<=" : "<";
         add_token(type, lexeme, "");
+        [[maybe_unused]] char _ = advance();
     } break;
 
     case '>': {
         const TokenType type = match_next('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER;
-        const string_view lexeme = match_next('=') ? ">=" : "=";
+        const string_view lexeme = match_next('=') ? ">=" : ">";
         add_token(type, lexeme, "");
+        [[maybe_unused]] char _ = advance();
     } break;
 
     case '/': {
@@ -298,10 +302,12 @@ Scanner::add_token(const TokenType type)
     add_token(type, "");
 }
 
+// NOTE(yemon): I don't quite like the existance of this guy.
+// Should probably think about simplifying this later on.
 void 
 Scanner::add_token(const TokenType type, const auto &literal)
 {
-    const auto lexeme = source.substr(start, current);
+    const auto lexeme = source.substr(start, current - start);
     Token new_token{ type, string{ lexeme }, string{ literal }, line};
     tokens.push_back(new_token);
 }
