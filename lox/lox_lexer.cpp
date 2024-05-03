@@ -1,6 +1,10 @@
 #include <stdexcept>
 #include "lox_lexer.h"
 
+#ifdef _DEBUG
+#include <type_traits>
+#endif
+
 [[nodiscard]] string
 TokenTypeToString(const TokenType &type)
 {
@@ -100,11 +104,28 @@ TokenTypeToString(const TokenType &type)
 [[nodiscard]] string
 Token::to_string() const
 {
-    auto token_type = TokenTypeToString(type);
+    const auto token_type = TokenTypeToString(type);
+    string output = token_type + " ";
+    if (lexeme.size() > 0) {
+        output += lexeme;
+    }
+
+#ifdef _DEBUG
+    static_assert(std::is_same<decltype(literal), std::string>::value, "Type of member 'literal' is not std::string.");
+#endif
+    if (literal.size() > 0) {
+        output += literal;
+    }
     return token_type + " " + lexeme + " " + literal;
 }
 
 //------------------------------------------------------------------------------
+
+vector<Token> 
+Scanner::get_tokens() const
+{
+    return tokens;
+}
 
 void 
 Scanner::scan_tokens()
@@ -154,23 +175,31 @@ Scanner::scan_token()
         break;
 
     case '!': {
-        add_token(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG);
+        const TokenType type = match_next('=') ? TokenType::BANG_EQUAL : TokenType::BANG;
+        const string_view lexeme = match_next('=') ? "!=" : "!";
+        add_token(type, lexeme, "");
     } break;
 
     case '=': {
-        add_token(match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL);
+        const TokenType type = match_next('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL;
+        const string_view lexeme = match_next('=') ? "==" : "=";
+        add_token(type, lexeme, "");
     } break;
 
     case '<': {
-        add_token(match('=') ? TokenType::LESS_EQUAL : TokenType::LESS);
+        const TokenType type = match_next('=') ? TokenType::LESS_EQUAL : TokenType::LESS;
+        const string_view lexeme = match_next('=') ? "<=" : "=";
+        add_token(type, lexeme, "");
     } break;
 
     case '>': {
-        add_token(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
+        const TokenType type = match_next('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER;
+        const string_view lexeme = match_next('=') ? ">=" : "=";
+        add_token(type, lexeme, "");
     } break;
 
     case '/': {
-        if (match('/')) {
+        if (match_next('/')) {
             while (peek() != '\n' && !is_end()) {
                 [[maybe_unused]] char _ = advance();
             }
@@ -250,26 +279,37 @@ Scanner::peek_next()
 }
 
 [[nodiscard]] bool 
-Scanner::match(char expected)
+Scanner::match_next(char expected) const
 {
-    if (is_end()) return false;
-    if (source.at(current) != expected) return false;
+    if (is_end()) {
+        return false;
+    }
+    if (source.at(current) != expected) {
+        return false;
+    }
 
-    current += 1;
+    //current += 1;
     return true;
 }
 
 void
-Scanner::add_token(const TokenType &type)
+Scanner::add_token(const TokenType type)
 {
     add_token(type, "");
 }
 
-void
-Scanner::add_token(const TokenType &type, const string &literal)
+void 
+Scanner::add_token(const TokenType type, const auto &literal)
 {
-    string text = source.substr(start, current);
-    Token new_token{ type, text, { literal }, line };
+    const auto lexeme = source.substr(start, current);
+    Token new_token{ type, string{ lexeme }, string{ literal }, line};
+    tokens.push_back(new_token);
+}
+
+void
+Scanner::add_token(const TokenType type, const string_view lexeme, const string_view literal)
+{
+    Token new_token{ type, string{ lexeme }, string{ literal }, line };
     tokens.push_back(new_token);
 }
 
@@ -293,8 +333,10 @@ Scanner::tokenize_string()
     [[maybe_unused]] char _ = advance();
 
     // Trim the start and end quotes
-    string literal = source.substr(start + 1, current - 1);
-    add_token(TokenType::STRING, literal);
+    size_t start_pos = start + 1;
+    size_t count = (current - start_pos) - 1;
+    string literal = source.substr(start_pos, count);
+    add_token(TokenType::STRING, "", literal);
 }
 
 void
@@ -317,9 +359,9 @@ Scanner::tokenize_number()
 
     // TODO(yemon): Only tokenizing the literal number value as string for now. 
     // Might want to specially parse it into their respective numeric types 
-    // (double, int) later on.
-    string number{ source.substr(start, current) };
-    add_token(TokenType::NUMBER, number);
+    // (double, int64, etc) later on.
+    string number{ source.substr(start, current - start) };
+    add_token(TokenType::NUMBER, "", number);
 }
 
 void 
@@ -328,17 +370,17 @@ Scanner::tokenize_identifier()
     char peek_ch = peek();
     while (is_alpha(peek_ch) || std::isdigit(peek_ch)) {
         [[maybe_unused]] char _ = advance();
+        peek_ch = peek();
     }
 
-    string identifier = source.substr(start, current);
+    string identifier = source.substr(start, current - start);
     if (const auto search_it = KEYWORDS.find(string_view{ identifier }); 
         search_it != KEYWORDS.end()) {
         const TokenType token_type = search_it->second;
         add_token(token_type);
     }
     else {
-        // TODO(yemon): Don't we need the identifier's name itself as well?
-        add_token(TokenType::IDENTIFIER);
+        add_token(TokenType::IDENTIFIER, identifier, "");
     }
 }
 

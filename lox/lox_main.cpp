@@ -7,7 +7,8 @@
 
 static const std::string_view PROMPT = ">> ";
 
-inline bool has_error = false;
+inline bool has_error   = false;
+inline bool should_quit = false;
 
 //------------------------------------------------------------------------------
 
@@ -23,8 +24,6 @@ ReplStart(const Options &options)
         std::cout << "(Verbose mode turned on)\n";
     }
 
-    bool should_quit = false;
-    
     std::string input_buffer{};
 
     while (!should_quit) {
@@ -64,7 +63,7 @@ Run(const std::string_view &source)
     Scanner scanner{ source };
     scanner.scan_tokens();
 
-    for (auto const &token : scanner.tokens) {
+    for (const auto &token : scanner.get_tokens()) {
         std::cout << token.to_string() << '\n';
     }
 }
@@ -92,11 +91,11 @@ int main(int argc, char **argv)
         RunFile(options);
     }
 
-    if (has_error) {
-        // TODO(yemon): Define some error codes to report back to the OS
-        return -1;
+    if (should_quit || !has_error) {
+        return 0;
     }
     else {
-        return 0;
+        // TODO(yemon): Define some error codes to report back to the OS
+        return -1;
     }
 }

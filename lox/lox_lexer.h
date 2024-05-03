@@ -129,7 +129,7 @@ public:
         line(0)
     {}
 
-    vector<Token> tokens;
+    vector<Token> get_tokens() const;
 
     void scan_tokens();
 
@@ -139,19 +139,24 @@ private:
     size_t current;
     uint32_t line;
 
+    vector<Token> tokens;
+
     void scan_token();
 
+private:
     [[nodiscard]] char advance();
 
     [[nodiscard]] char peek();
 
     [[nodiscard]] char peek_next();
 
-    [[nodiscard]] bool match(char expected);
+    [[nodiscard]] bool match_next(char expected) const;
 
-    void add_token(const TokenType &type);
+    void add_token(const TokenType type);
 
-    void add_token(const TokenType &type, const string &literal);
+    void add_token(const TokenType type, const auto &literal);
+
+    void add_token(const TokenType type, const string_view lexeme, const string_view literal);
 
     void tokenize_string();
 
