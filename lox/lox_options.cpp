@@ -9,10 +9,6 @@
 ParseOptions(int argc, char **argv)
 {
     Options options{};
-    if (argc == 1) {
-        options.repl_start = true;
-        return options;
-    }
 
     auto to_string = [](const char *v) { return string(v); };
     auto args = std::span(argv, argc) | std::views::transform(to_string);
@@ -27,7 +23,11 @@ ParseOptions(int argc, char **argv)
             continue;
         }
         if (*it == "-h" || *it == "--help") {
-            options.verbose = true;
+            options.show_help = true;
+            continue;
+        }
+        if (*it == "-r" || *it == "--repl") {
+            options.repl_start = true;
             continue;
         }
 

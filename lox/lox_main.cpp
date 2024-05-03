@@ -63,8 +63,10 @@ Run(const std::string_view &source, const Options &options)
     Scanner scanner{ source };
     scanner.scan_tokens();
 
-    for (const auto &token : scanner.get_tokens()) {
-        std::cout << token.to_string() << '\n';
+    if (options.verbose) {
+        for (const auto &token : scanner.get_tokens()) {
+            std::cout << token.to_string() << '\n';
+        }
     }
 }
 
