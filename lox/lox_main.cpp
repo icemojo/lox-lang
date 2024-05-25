@@ -5,8 +5,6 @@
 #include "lox_ast.h"
 
 
-static const std::string_view PROMPT = ">> ";
-
 inline bool has_error   = false;
 inline bool should_quit = false;
 
@@ -27,7 +25,7 @@ ReplStart(const Options &options)
     std::string input_buffer{};
 
     while (!should_quit) {
-        std::cout << PROMPT;
+        std::cout << ">> ";
         std::getline(std::cin, input_buffer);
 
         if (std::cin.fail()) {
