@@ -1,3 +1,4 @@
+#include <iostream>
 #include "lox_lexer.h"
 #include "lox_ast.h"
 
@@ -147,6 +148,8 @@ Printer::operator()(const Unary &unary) const
 
 void test()
 {
+    std::cout << "test(): -123\n";
+
     Expr binary = BinaryExpr{
         //.optr = Token{ TokenType::PLUS, "+", "+", 0 }
     };
@@ -164,10 +167,13 @@ void test()
     };
     std::visit(Printer{}, unary);
 
+    std::cout << '\n';
 }
 
 void test2()
 {
+    std::cout << "test2(): -123 * 45.67\n";
+
     // (- 123)
     ExprPtr lit1 = make_literal("123");
     std::visit(Printer{ true }, *lit1);
@@ -194,5 +200,7 @@ void test2()
 
     ExprPtr expr2 = std::move(std::visit(Copier{}, *expr));
     std::visit(Printer{ true }, *expr2);
+
+    std::cout << '\n';
 }
 
