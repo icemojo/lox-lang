@@ -3,109 +3,124 @@
 ExprPtr 
 Parser::parse()
 {
-    return std::make_unique<Expr>();        // TODO(yemon): TEMP!
-    //return expression();
+    return expression();
     // catch (ParserError error) { return null; }
 }
 
-Expr
+ExprPtr
 Parser::expression()
 {
     return equality();
 }
 
-Expr 
+ExprPtr 
 Parser::equality()
 {
-    Expr expr = comparision();
+    ExprPtr expr = comparision();
     while (match({ TokenType::EQUAL_EQUAL, TokenType::BANG_EQUAL })) {
         Token optr = previous();
-        Expr right = comparision();
-        // TODO(yemon): expr = make_binary_expr(expr, optr, right);
+        ExprPtr right = comparision();
+        expr = make_binary_expr(
+            std::move(std::visit(CopierVisiter{}, *expr)),
+            optr, 
+            std::move(std::visit(CopierVisiter{}, *right))
+        );
     }
     return expr;
 }
 
-Expr 
+ExprPtr 
 Parser::comparision()
 {
-    Expr expr = term();
+    ExprPtr expr = term();
     while (match({ 
         TokenType::GREATER, TokenType::GREATER_EQUAL, 
         TokenType::LESS, TokenType::LESS_EQUAL })) 
     {
         Token optr = previous();
-        Expr right = term();
-        // TODO(yemon): expr = make_binary_expr(expr, optr, right);
+        ExprPtr right = term();
+        expr = make_binary_expr(
+            std::move(std::visit(CopierVisiter{}, *expr)),
+            optr,
+            std::move(std::visit(CopierVisiter{}, *right))
+        );
     }
     return expr;
 }
 
-Expr 
+ExprPtr 
 Parser::term()
 {
-    Expr expr = factor();
+    ExprPtr expr = factor();
     while (match({ TokenType::MINUS, TokenType::PLUS })) {
         Token optr = previous();
-        Expr right = factor();
-        // TODO(yemon): expr = make_binary_expr(expr, optr, right);
+        ExprPtr right = factor();
+        expr = make_binary_expr(
+            std::move(std::visit(CopierVisiter{}, *expr)),
+            optr,
+            std::move(std::visit(CopierVisiter{}, *right))
+        );
     }
     return expr;
 }
 
-Expr 
+ExprPtr 
 Parser::factor()
 {
-    Expr expr = unary();
+    ExprPtr expr = unary();
     while (match({ TokenType::SLASH, TokenType::STAR })) {
         Token optr = previous();
-        Expr right = unary();
-        // TODO(yemon): expr = make_binary_expr(expr, optr, right);
+        ExprPtr right = unary();
+        expr = make_binary_expr(
+            std::move(std::visit(CopierVisiter{}, *expr)),
+            optr,
+            std::move(std::visit(CopierVisiter{}, *right))
+        );
     }
     return expr;
 }
 
-Expr 
+ExprPtr 
 Parser::unary()
 {
     if (match({ TokenType::BANG, TokenType::MINUS })) {
         Token optr = previous();
-        Expr right = unary();
-        // TODO(yemon): expr = make_unary(optr, right);
+        ExprPtr right = unary();
+        ExprPtr expr = make_unary(optr, std::move(std::visit(CopierVisiter{}, *right)));
+        return expr;
     }
     return primary();
 }
 
-Expr 
+ExprPtr 
 Parser::primary()
 {
-    Expr temp{};
     if (match({ TokenType::FALSE })) {
-        // TODO(yemon): expr = make_literal("false");
-        return temp;
+        auto expr = make_literal("false");
+        return expr;
     }
     if (match({ TokenType::TRUE })) {
-        // TODO(yemon): expr = make_literal("true");
-        return temp;
+        auto expr = make_literal("true");
+        return expr;
     }
     if (match({ TokenType::NIL })) {
-        // TODO(yemon): expr = make_literal("nil");
-        return temp;
+        auto expr = make_literal("nil");
+        return expr;
     }
 
     if (match({ TokenType::NUMBER, TokenType::STRING })) {
-        // TODO(yemon): expr = make_literal(previous().literal);
-        return temp;
+        auto expr = make_literal(previous().literal);
+        return expr;
     }
 
     if (match({ TokenType::LEFT_PAREN })) {
-        Expr expr = expression();
+        auto expr = expression();
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
-        // TODO(yemon): expr = make_grouping(expr);
-        return temp;
+        auto group_expr = make_grouping(std::move(expr));
+        return group_expr;
     }
 
-    // throw/return error(peek(), "Expect an expression.")
+    // TODO(yemon): throw/return error(peek(), "Expect an expression.")
 }
 
 //------------------------------------------------------------------------------

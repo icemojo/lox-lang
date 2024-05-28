@@ -11,30 +11,31 @@ using std::vector;
 
 class Parser {
 public:
+    // TODO(yemon): There's just no reason to copy out the entire tokens list.
     Parser(const vector<Token> tokens) : 
         tokens(tokens)
     {}
 
 private:
-    const vector<Token> &tokens;
+    const vector<Token> tokens;
     size_t current = 0;
 
 public:
     ExprPtr parse();
 
-    Expr expression();
+    ExprPtr expression();
 
-    Expr equality();
+    ExprPtr equality();
 
-    Expr comparision();
+    ExprPtr comparision();
 
-    Expr term();
+    ExprPtr term();
 
-    Expr factor();
+    ExprPtr factor();
 
-    Expr unary();
+    ExprPtr unary();
 
-    Expr primary();
+    ExprPtr primary();
 
 private:
     bool match(std::initializer_list<TokenType> token_types);
