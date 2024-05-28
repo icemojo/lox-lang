@@ -1,5 +1,5 @@
-#ifndef LOX_PARSER_
-#define LOX_PARSER_
+#ifndef LOX_LEXER_
+#define LOX_LEXER_
 
 #include <string>
 #include <vector>
@@ -108,14 +108,13 @@ public:
         line(line)
     {}
 
+    TokenType type;
     string lexeme;
+    string literal;
+    uint32_t line;
 
     string to_string() const;
 
-private:
-    TokenType type;
-    string literal;
-    uint32_t line;
 };
 
 //------------------------------------------------------------------------------
@@ -170,4 +169,4 @@ private:
 
 [[nodiscard]] bool is_alpha(const char c);
 
-#endif  // LOX_PARSER_
+#endif  // LOX_LEXER_

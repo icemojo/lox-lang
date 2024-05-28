@@ -75,6 +75,17 @@ ReportError(const int32_t line, const std::string_view &where, const std::string
     has_error = true;
 }
 
+static void
+ThrowError(Token token, const std::string &message)
+{
+    if (token.type == TokenType::EOF_) {
+        ReportError(token.line, " at end ", message);
+    }
+    else {
+        ReportError(token.line, " at '" + token.lexeme + "'", message);
+    }
+}
+
 //------------------------------------------------------------------------------
 
 int main(int argc, char **argv)
