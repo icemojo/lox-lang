@@ -1,5 +1,13 @@
 #include "lox_parser.h"
 
+ExprPtr 
+Parser::parse()
+{
+    return std::make_unique<Expr>();        // TODO(yemon): TEMP!
+    //return expression();
+    // catch (ParserError error) { return null; }
+}
+
 Expr
 Parser::expression()
 {
@@ -96,6 +104,8 @@ Parser::primary()
         // TODO(yemon): expr = make_grouping(expr);
         return temp;
     }
+
+    // throw/return error(peek(), "Expect an expression.")
 }
 
 //------------------------------------------------------------------------------
@@ -152,7 +162,7 @@ Parser::consume(TokenType token_type, const string_view message)
     return result.token_result;
 }
 
-Token 
+void 
 Parser::synchronize()
 {
     advance();

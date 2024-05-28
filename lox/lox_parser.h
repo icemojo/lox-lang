@@ -20,6 +20,8 @@ private:
     size_t current = 0;
 
 public:
+    ExprPtr parse();
+
     Expr expression();
 
     Expr equality();
@@ -48,6 +50,8 @@ private:
     Token advance();
 
     Token consume(TokenType token_type, const string_view message);
+
+    void synchronize();
 
 };
 
