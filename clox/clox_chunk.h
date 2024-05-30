@@ -3,6 +3,8 @@
 
 #include "clox_common.h"
 
+// NOTE(yemon): Instructions can potentially have *different* sizes.
+
 typedef enum {
     OP_RETURN,
 } Op_Code;
