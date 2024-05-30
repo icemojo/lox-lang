@@ -15,17 +15,18 @@ typedef enum {
 } Op_Code;
 
 typedef struct {
-    uint32_t count;
-    uint32_t capacity;
-    uint8_t *code;
-    Value_Array constants;
+    uint32_t     count;
+    uint32_t     capacity;
+    uint8_t      *code;
+    uint32_t     *lines;
+    Value_Array  constants;
 } Chunk;
 
 void init_chunk(Chunk *chunk);
 
 void free_chunk(Chunk *chunk);
 
-void write_chunk(Chunk *chunk, const uint8_t byte);
+void write_chunk(Chunk *chunk, const uint8_t byte, const uint32_t line);
 
 uint32_t add_chunk_constant(Chunk *chunk, const Value value);
 
