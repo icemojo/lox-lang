@@ -146,7 +146,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="clox_chunk.c" />
     <ClCompile Include="clox_main.c" />
+    <ClCompile Include="clox_memory.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="clox_chunk.h" />
+    <ClInclude Include="clox_common.h" />
+    <ClInclude Include="clox_memory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
