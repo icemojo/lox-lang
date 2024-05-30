@@ -148,13 +148,11 @@
     <ClCompile Include="lox_main.cpp" />
     <ClCompile Include="lox_options.cpp" />
     <ClCompile Include="lox_lexer.cpp" />
-    <ClCompile Include="lox_parser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lox_ast.h" />
     <ClInclude Include="lox_options.h" />
     <ClInclude Include="lox_lexer.h" />
-    <ClInclude Include="lox_parser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,7 +3,7 @@
 #include "lox_options.h"
 #include "lox_lexer.h"
 #include "lox_ast.h"
-#include "lox_parser.h"
+//#include "lox_parser.h"
 
 
 inline bool has_error   = false;
@@ -68,10 +68,12 @@ Run(const std::string_view &source, const Options &options)
     //    }
     //}
 
-    Parser parser{ scanner.get_tokens() };
-    auto expr = parser.parse();
-    if (has_error) { return; }
-    std::visit(PrinterVisiter{ true }, *expr);
+    //Parser parser{ scanner.get_tokens() };
+    //auto expr = parser.parse();
+    //if (has_error) { return; }
+    //if (expr) { 
+        //std::visit(PrinterVisiter{ true }, *expr); 
+    //}
 }
 
 static void
@@ -96,8 +98,8 @@ ThrowError(Token token, const std::string &message)
 
 int main(int argc, char **argv)
 {
-    //test2();
-    //return 0;
+    test2();
+    return 0;
 
     Options options = ParseOptions(argc, argv);
 
