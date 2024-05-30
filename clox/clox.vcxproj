@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{122ef2d6-fc49-4a56-9e44-973d6043804b}</ProjectGuid>
+    <ProjectGuid>{CB243D13-6E98-4FA7-994F-B651099CB096}</ProjectGuid>
     <RootNamespace>lox</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -71,12 +71,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>lox</TargetName>
+    <TargetName>clox</TargetName>
     <OutDir>$(SolutionDir)bin-Debug\</OutDir>
-    <IntDir>$(SolutionDir)bin-Debug\obj\</IntDir>
+    <IntDir>$(SolutionDir)bin-Debug\objc\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>lox</TargetName>
+    <TargetName>clox</TargetName>
+    <OutDir>$(SolutionDir)bin-Debug\</OutDir>
+    <IntDir>$(SolutionDir)bin-Debug\objc\</IntDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnabled>false</VcpkgEnabled>
@@ -144,15 +146,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lox_ast.cpp" />
-    <ClCompile Include="lox_main.cpp" />
-    <ClCompile Include="lox_options.cpp" />
-    <ClCompile Include="lox_lexer.cpp" />
+    <ClCompile Include="clox_chunk.c" />
+    <ClCompile Include="clox_debug.c" />
+    <ClCompile Include="clox_main.c" />
+    <ClCompile Include="clox_memory.c" />
+    <ClCompile Include="clox_value.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lox_ast.h" />
-    <ClInclude Include="lox_options.h" />
-    <ClInclude Include="lox_lexer.h" />
+    <ClInclude Include="clox_chunk.h" />
+    <ClInclude Include="clox_common.h" />
+    <ClInclude Include="clox_debug.h" />
+    <ClInclude Include="clox_memory.h" />
+    <ClInclude Include="clox_value.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
