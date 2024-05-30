@@ -2,23 +2,31 @@
 #define CLOX_CHUNK_H_
 
 #include "clox_common.h"
+#include "clox_value.h"
 
-// NOTE(yemon): Instructions can potentially have *different* sizes.
+// NOTE(yemon): Instructions in each chunk can potentially have *different* sizes.
+// For instance;
+//     1 byte  =  OP_RETURN
+//     2 bytes =  OP_CONSTANT [index]
 
 typedef enum {
-    OP_RETURN,
+    OP_RETURN   = 0x00,
+    OP_CONSTANT,
 } Op_Code;
 
 typedef struct {
     uint32_t count;
     uint32_t capacity;
     uint8_t *code;
+    Value_Array constants;
 } Chunk;
 
 void init_chunk(Chunk *chunk);
 
 void free_chunk(Chunk *chunk);
 
-void write_chunk(Chunk *chunk, uint8_t byte);
+void write_chunk(Chunk *chunk, const uint8_t byte);
+
+uint32_t add_chunk_constant(Chunk *chunk, const Value value);
 
 #endif // CLOX_CHUNK_H_
