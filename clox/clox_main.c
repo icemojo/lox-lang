@@ -1,9 +1,13 @@
 #include "clox_common.h"
+#include "clox_vm.h"
 #include "clox_chunk.h"
 #include "clox_debug.h"
 
 int main(const int argc, const char **argv)
 {
+    VM vm;
+    init_vm(&vm);
+
     Chunk chunk;
     init_chunk(&chunk);
 
@@ -15,7 +19,10 @@ int main(const int argc, const char **argv)
 
     disassemble_chunk(&chunk, "Test chunk");
 
+    Interpret_Result result = interpret(&vm, &chunk);
+
     free_chunk(&chunk);
+    free_vm(&vm);
 
     return 0;
 }

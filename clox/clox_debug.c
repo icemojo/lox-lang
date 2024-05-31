@@ -12,7 +12,7 @@ simple_instruction(const char *display, uint32_t offset)
 static uint32_t
 constant_instruction(const char *display, const Chunk *chunk, uint32_t offset)
 {
-    uint8_t constant_index = chunk->code[offset+1];
+    uint8_t constant_index = chunk->codes[offset+1];
     printf("%-12s [%d] '", display, constant_index);
     print_value(chunk->constants.values[constant_index]);
     printf("'\n");
@@ -41,7 +41,7 @@ uint32_t disassemble_instruction(const Chunk *chunk, uint32_t offset)
         printf("%4d ", chunk->lines[offset]);
     }
 
-    uint8_t instruction = chunk->code[offset];
+    uint8_t instruction = chunk->codes[offset];
     switch (instruction) {
     case OP_CONSTANT: {
         return constant_instruction("OP_CONSTANT", chunk, offset);

@@ -151,6 +151,7 @@
     <ClCompile Include="clox_main.c" />
     <ClCompile Include="clox_memory.c" />
     <ClCompile Include="clox_value.c" />
+    <ClCompile Include="clox_vm.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="clox_chunk.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="clox_debug.h" />
     <ClInclude Include="clox_memory.h" />
     <ClInclude Include="clox_value.h" />
+    <ClInclude Include="clox_vm.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
