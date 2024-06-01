@@ -14,7 +14,7 @@ int main(const int argc, const char **argv)
     uint32_t last_index = add_chunk_constant(&chunk, 3.14);
     write_chunk(&chunk, OP_CONSTANT, 1);
     write_chunk(&chunk, last_index, 1);
-
+    write_chunk(&chunk, OP_NEGATE, 1);
     write_chunk(&chunk, OP_RETURN, 2);
 
     //disassemble_chunk(&chunk, "Test chunk");

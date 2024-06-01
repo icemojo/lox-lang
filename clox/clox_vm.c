@@ -32,6 +32,11 @@ static Interpret_Result run(VM *vm)
             push_stack(vm, constant);
         } break;
 
+        case OP_NEGATE: {
+            Value value = pop_stack(vm);
+            push_stack(vm, -value);
+        } break;
+
         case OP_RETURN: {
             print_value(pop_stack(vm));
             printf("\n");

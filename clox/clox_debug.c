@@ -47,6 +47,10 @@ uint32_t disassemble_instruction(const Chunk *chunk, uint32_t offset)
         return constant_instruction("OP_CONSTANT", chunk, offset);
     } break;
 
+    case OP_NEGATE: {
+        return simple_instruction("OP_NEGATE", offset);
+    } break;
+
     case OP_RETURN: {
         return simple_instruction("OP_RETURN", offset);
     } break;
