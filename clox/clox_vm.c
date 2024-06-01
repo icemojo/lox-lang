@@ -92,6 +92,12 @@ Interpret_Result interpret(VM *vm, Chunk *chunk)
     return run(vm);
 }
 
+Interpret_Result interpret_line(VM *vm, const char *source_line)
+{
+    // TODO(yemon): ???
+    return INTERPRET_OK;
+}
+
 void free_vm(VM *vm)
 {
     vm->chunk = NULL;
