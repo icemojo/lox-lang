@@ -11,6 +11,12 @@ static Interpret_Result run(VM *vm)
 {
 #define READ_BYTE(vm)       (*vm->instruction_ptr++)
 #define READ_CONSTANT(vm)   (vm->chunk->constants.values[READ_BYTE(vm)])
+#define BINARY_OP(vm, op)   \
+            do { \
+                Value b = pop_stack(vm); \
+                Value a = pop_stack(vm); \
+                push_stack(vm, a op b); \
+            } while (false)
 
     for (;;) {
 #ifdef DEBUG_TRACE_EXECUTION
@@ -32,6 +38,22 @@ static Interpret_Result run(VM *vm)
             push_stack(vm, constant);
         } break;
 
+        case OP_ADD: {
+            BINARY_OP(vm, +); 
+        } break;
+
+        case OP_SUBTRACT: {
+            BINARY_OP(vm, -);
+        } break;
+
+        case OP_MULTIPLY: {
+            BINARY_OP(vm, *);
+        } break;
+
+        case OP_DIVIDE: {
+            BINARY_OP(vm, /);
+        } break;
+
         case OP_NEGATE: {
             Value value = pop_stack(vm);
             push_stack(vm, -value);
@@ -50,6 +72,7 @@ static Interpret_Result run(VM *vm)
 
 #undef READ_BYTE
 #undef READ_CONSTANT
+#undef BINARY_OP
 }
 
 //------------------------------------------------------------------------------

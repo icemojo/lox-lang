@@ -12,6 +12,10 @@
 typedef enum {
     OP_RETURN   = 0x00,
     OP_CONSTANT,
+    OP_ADD,
+    OP_SUBTRACT,
+    OP_MULTIPLY,
+    OP_DIVIDE,
     OP_NEGATE,
 } Op_Code;
 

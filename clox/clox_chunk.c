@@ -37,3 +37,4 @@ uint32_t add_chunk_constant(Chunk *chunk, const Value value)
     write_value_array(&chunk->constants, value);
     return chunk->constants.count - 1;
 }
+

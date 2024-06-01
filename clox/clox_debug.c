@@ -47,6 +47,22 @@ uint32_t disassemble_instruction(const Chunk *chunk, uint32_t offset)
         return constant_instruction("OP_CONSTANT", chunk, offset);
     } break;
 
+    case OP_ADD: {
+        return simple_instruction("OP_ADD", offset);
+    } break;
+
+    case OP_SUBTRACT: {
+        return simple_instruction("OP_SUBTRACT", offset);
+    } break;
+
+    case OP_MULTIPLY: {
+        return simple_instruction("OP_MULTIPLY", offset);
+    } break;
+
+    case OP_DIVIDE: {
+        return simple_instruction("OP_DIVIDE", offset);
+    } break;
+
     case OP_NEGATE: {
         return simple_instruction("OP_NEGATE", offset);
     } break;
