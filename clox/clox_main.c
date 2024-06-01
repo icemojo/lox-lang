@@ -17,7 +17,7 @@ int main(const int argc, const char **argv)
 
     write_chunk(&chunk, OP_RETURN, 2);
 
-    disassemble_chunk(&chunk, "Test chunk");
+    //disassemble_chunk(&chunk, "Test chunk");
 
     Interpret_Result result = interpret(&vm, &chunk);
 

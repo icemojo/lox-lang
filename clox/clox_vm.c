@@ -2,6 +2,11 @@
 #include "clox_vm.h"
 #include "clox_debug.h"
 
+static void reset_stack(VM *vm)
+{
+    vm->stack_top = vm->stack;
+}
+
 static Interpret_Result run(VM *vm)
 {
 #define READ_BYTE(vm)       (*vm->instruction_ptr++)
@@ -9,6 +14,14 @@ static Interpret_Result run(VM *vm)
 
     for (;;) {
 #ifdef DEBUG_TRACE_EXECUTION
+        printf("== STACK: ");
+        for (Value *slot = vm->stack; slot < vm->stack_top; slot += 1) {
+            printf("[");
+            print_value(*slot);
+            printf("] ");
+        }
+        printf("==\n");
+
         uint32_t offset = (uint32_t)(vm->instruction_ptr - vm->chunk->codes);
         disassemble_instruction(vm->chunk, offset);
 #endif
@@ -16,11 +29,12 @@ static Interpret_Result run(VM *vm)
         switch (instruction) {
         case OP_CONSTANT: {
             Value constant = READ_CONSTANT(vm);
-            print_value(constant);
-            printf("\n");
+            push_stack(vm, constant);
         } break;
 
         case OP_RETURN: {
+            print_value(pop_stack(vm));
+            printf("\n");
             return INTERPRET_OK;    // TODO(yemon): Temp!
         } break;
 
@@ -39,6 +53,7 @@ void init_vm(VM *vm)
 {
     vm->chunk = NULL;
     vm->instruction_ptr = NULL;
+    reset_stack(vm);
 }
 
 Interpret_Result interpret(VM *vm, Chunk *chunk)
@@ -54,5 +69,17 @@ void free_vm(VM *vm)
     vm->chunk = NULL;
     vm->instruction_ptr = NULL;
     init_vm(vm);
+}
+
+void push_stack(VM *vm, Value value)
+{
+    *(vm->stack_top) = value;
+    vm->stack_top += 1;
+}
+
+Value pop_stack(VM *vm)
+{
+    vm->stack_top -= 1;
+    return *(vm->stack_top);
 }
 
