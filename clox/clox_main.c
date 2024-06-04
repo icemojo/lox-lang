@@ -7,17 +7,54 @@
 #include "clox_chunk.h"
 //#include "clox_debug.h"
 
+static bool str_cmp(const char *str1, const char *str2) 
+{
+    if (str1 == NULL || str2 == NULL) {
+        return false;
+    }
+    return strcmp(str1, str2) == 0;
+}
+
 typedef struct {
     bool verbose;
+    bool show_help;
+    bool repl_start;
+    const char *input_file;
 } Options;
 
 static Options parse_options(const int argc, const char **argv)
 {
-    Options options;
+    Options options = {0};
 
-    // TODO(yemon): Parse the command line options from the 3rd argument forward.
+    for (int i = 1; i < argc; i += 1) {
+        const char *arg = argv[i];
+        if (str_cmp(arg, "-v") || str_cmp(arg, "--verbose")) {
+            options.verbose = true;
+            continue;
+        }
+        if (str_cmp(arg, "-h") || str_cmp(arg, "--help")) {
+            options.show_help = true;
+            continue;
+        }
+        if (str_cmp(arg, "-r") || str_cmp(arg, "--repl")) {
+            options.repl_start = true; 
+            continue;
+        }
+        
+        options.input_file = arg;
+    }
 
     return options;
+}
+
+static void print_options(const Options *options)
+{
+    printf("Options: {\n");
+    printf("\tverbose=%s, \n", options->verbose ? "true" : "false");
+    printf("\tshow_help=%s, \n", options->show_help ? "true" : "false");
+    printf("\trepl_start=%s, \n", options->repl_start ? "true" : "false");
+    printf("\tinput_file=\"%s\", \n", options->input_file != NULL ? options->input_file : "");
+    printf("}\n");
 }
 
 typedef struct {
@@ -101,14 +138,17 @@ static void write_test_program(Chunk *chunk)
 
 int main(const int argc, const char **argv)
 {
+    Options options = parse_options(argc, argv);
+    print_options(&options);
+
     VM vm;
     init_vm(&vm);
 
-    if (argc == 1) {
+    if (options.repl_start) {
         start_repl(&vm);
     }
-    else if (argc == 2) {
-        run_file(&vm, argv[1]);
+    else if (options.input_file != NULL) {
+        run_file(&vm, options.input_file);
     }
     else {
         // TODO(yemon): Parse the rest of the command line options
