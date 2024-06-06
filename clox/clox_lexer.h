@@ -70,6 +70,8 @@ Token make_token(const Scanner *scanner, const Token_Type type);
 
 Token make_error_token(const char *message, const int32_t line);
 
+Token make_string();
+
 // NOTE(yemon): `start` points to the start of current lexeme,
 // not the start of the entire source line.
 // The scanner will only walk its way through the source once.
@@ -83,6 +85,18 @@ void init_scanner(Scanner *scanner, const char *source_line);
 
 Token scan_token(Scanner *scanner);
 
+void skip_whitespaces(Scanner *scanner);
+
+Token parse_string(Scanner *scanner);
+
+char scanner_advance(Scanner *scanner);
+
 bool scanner_is_end(const Scanner *scanner);
+
+bool scanner_match(Scanner *scanner, const char expected);
+
+char scanner_peek(const Scanner *scanner);
+
+char scanner_peek_next(const Scanner *scanner);
 
 #endif // CLOX_LEXER_H_
