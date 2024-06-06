@@ -24,7 +24,7 @@ void init_vm(VM *vm);
 
 Interpret_Result interpret(VM *vm, Chunk *chunk);
 
-Interpret_Result interpret_line(VM *vm, const char *source_line);
+Interpret_Result interpret_source(VM *vm, const char *source_line);
 
 void free_vm(VM *vm);
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "clox_vm.h"
+#include "clox_compiler.h"
 #include "clox_debug.h"
 
 static void reset_stack(VM *vm)
@@ -92,9 +93,11 @@ Interpret_Result interpret(VM *vm, Chunk *chunk)
     return run(vm);
 }
 
-Interpret_Result interpret_line(VM *vm, const char *source_line)
+Interpret_Result interpret_source(VM *vm, const char *source_line)
 {
-    // TODO(yemon): ???
+    // TODO(yemon): Kick off the Lexer+Compiler pipeline in order to
+    // spit out the bytecode.
+    compile(source_line);
     return INTERPRET_OK;
 }
 

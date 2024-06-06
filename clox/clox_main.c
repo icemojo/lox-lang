@@ -95,8 +95,10 @@ static Input_File read_file(const char *filepath)
 
 static void run_file(VM *vm, const char *filepath)
 {
+    // TODO(yemon): Technically, the `Input_File` is not limited to the `run_file(..)`
+    // repl inputs can be parsed as in Input_File and pass along to the Lexer as well. 
     Input_File input_file = read_file(filepath);
-    Interpret_Result result = interpret_line(vm, input_file.source);
+    Interpret_Result result = interpret_source(vm, input_file.source);
     free(input_file.source);
 
     if (result == INTERPRET_COMPILE_ERROR) exit(65);
@@ -114,7 +116,8 @@ static void start_repl(VM *vm)
             break;
         }
 
-        Interpret_Result result = interpret_line(vm, line_buffer);
+        //printf("%s", line_buffer);
+        Interpret_Result result = interpret_source(vm, line_buffer);
     }
 }
 

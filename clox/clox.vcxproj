@@ -147,7 +147,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="clox_chunk.c" />
+    <ClCompile Include="clox_compiler.c" />
     <ClCompile Include="clox_debug.c" />
+    <ClCompile Include="clox_lexer.c" />
     <ClCompile Include="clox_main.c" />
     <ClCompile Include="clox_memory.c" />
     <ClCompile Include="clox_value.c" />
@@ -156,7 +158,9 @@
   <ItemGroup>
     <ClInclude Include="clox_chunk.h" />
     <ClInclude Include="clox_common.h" />
+    <ClInclude Include="clox_compiler.h" />
     <ClInclude Include="clox_debug.h" />
+    <ClInclude Include="clox_lexer.h" />
     <ClInclude Include="clox_memory.h" />
     <ClInclude Include="clox_value.h" />
     <ClInclude Include="clox_vm.h" />
