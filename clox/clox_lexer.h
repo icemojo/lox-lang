@@ -70,8 +70,6 @@ Token make_token(const Scanner *scanner, const Token_Type type);
 
 Token make_error_token(const char *message, const int32_t line);
 
-Token make_string();
-
 // NOTE(yemon): `start` points to the start of current lexeme,
 // not the start of the entire source line.
 // The scanner will only walk its way through the source once.
@@ -85,9 +83,19 @@ void init_scanner(Scanner *scanner, const char *source_line);
 
 Token scan_token(Scanner *scanner);
 
-void skip_whitespaces(Scanner *scanner);
+Token scan_string_token(Scanner *scanner);
 
-Token parse_string(Scanner *scanner);
+Token scan_number_token(Scanner *scanner);
+
+Token scan_identifier_token(Scanner *scanner);
+
+Token_Type 
+get_correct_identifier_type(const Scanner *scanner);
+
+Token_Type 
+check_keyword(const Scanner *scanner, int32_t start, int32_t length, const char *rest, Token_Type token_type);
+
+void skip_whitespaces(Scanner *scanner);
 
 char scanner_advance(Scanner *scanner);
 

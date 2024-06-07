@@ -7,6 +7,13 @@ static bool is_digit(const char c)
     return c >= '0' && c <= '9';
 }
 
+static bool is_alpha(const char c)
+{
+    return (c >= 'a' && c <= 'z') ||
+           (c >= 'A' && c <= 'Z') || 
+           (c == '_');
+}
+
 //------------------------------------------------------------------------------
 
 const char *token_type_to_string(const Token_Type type)
@@ -140,9 +147,12 @@ Token scan_token(Scanner *scanner)
 
     char ch = scanner_advance(scanner);
 
-    // NOTE(yemon): Handle the number literal case before anything else.
+    // NOTE(yemon): Handle the number literal and identifier cases before anything else.
     if (is_digit(ch)) {
-        return parse_number(scanner);
+        return scan_number_token(scanner);
+    }
+    if (is_alpha(ch)) {
+        return scan_identifier_token(scanner);
     }
 
     switch (ch) {
@@ -191,11 +201,120 @@ Token scan_token(Scanner *scanner)
     }
 
     case '"': {
-        return parse_string(scanner);
+        return scan_string_token(scanner);
     }
     }
 
     return make_error_token("Unexpected character.", scanner->line);
+}
+
+Token scan_string_token(Scanner *scanner)
+{
+    while (scanner_peek(scanner) != '"' && !scanner_is_end(scanner)) {
+        // NOTE(yemon): Allowing multi-line strings.
+        if (scanner_peek(scanner) == '\n') {
+            scanner->line += 1;
+            scanner_advance(scanner);
+        }
+    }
+
+    if (scanner_is_end(scanner)) {
+        return make_error_token("Unterminated string literal.", scanner->line);
+    }
+
+    // The closing quote.
+    scanner_advance(scanner);
+    return make_token(scanner, TOKEN_STRING);
+}
+
+Token scan_number_token(Scanner *scanner)
+{
+    while (is_digit(scanner_peek(scanner))) {
+        scanner_advance(scanner);
+    }
+
+    // Look for a fractional point, which could be followed by more numbers.
+    if (scanner_peek(scanner) == '.' && is_digit(scanner_peek_next(scanner))) {
+        // consumes the '.'
+        scanner_advance(scanner);
+
+        while (is_digit(scanner_peek(scanner))) {
+            scanner_advance(scanner);
+        }
+    }
+
+    return make_token(scanner, TOKEN_NUMBER);
+}
+
+Token scan_identifier_token(Scanner *scanner)
+{
+    char peek_ch = scanner_peek(scanner);
+    while (is_alpha(peek_ch) || is_digit(peek_ch)) {
+        scanner_advance(scanner);
+        peek_ch = scanner_peek(scanner);
+    }
+
+    Token_Type correct_token_type = get_correct_identifier_type(scanner);
+    return make_token(scanner, correct_token_type);
+}
+
+Token_Type 
+get_correct_identifier_type(const Scanner *scanner)
+{
+    // The big tree of 'keywords', as simple as it can get, without resorting 
+    // to fancier things like hashmaps.
+    const char first_ch      = *(scanner->start);
+    const bool has_second_ch = (scanner->current-scanner->start > 1);
+    char second_ch           = '\0';
+    if (has_second_ch) {
+        second_ch            = *(scanner->start+1);
+    }
+
+    switch (first_ch) {
+    case 'a': { return check_keyword(scanner, 1, 2, "nd", TOKEN_AND); }
+    case 'c': { return check_keyword(scanner, 1, 4, "lass", TOKEN_CLASS); }
+    case 'e': { return check_keyword(scanner, 1, 3, "lse", TOKEN_ELSE); }
+    case 'f': {
+        if (has_second_ch) {
+            switch (second_ch) {
+            case 'a': { return check_keyword(scanner, 2, 3, "lse", TOKEN_FALSE); }
+            case 'o': { return check_keyword(scanner, 2, 1, "r", TOKEN_FOR); }
+            case 'u': { return check_keyword(scanner, 2, 1, "n", TOKEN_FUNCTION); }
+            }
+        }
+        break;
+    }
+    case 'i': { return check_keyword(scanner, 1, 1, "f", TOKEN_IF); }
+    case 'n': { return check_keyword(scanner, 1, 2, "il", TOKEN_NIL); }
+    case 'o': { return check_keyword(scanner, 1, 1, "r", TOKEN_OR); }
+    case 'p': { return check_keyword(scanner, 1, 4, "rint", TOKEN_PRINT); }
+    case 'r': { return check_keyword(scanner, 1, 5, "eturn", TOKEN_RETURN); }
+    case 's': { return check_keyword(scanner, 1, 4, "uper", TOKEN_SUPER); }
+    case 't': {
+        if (has_second_ch) {
+            switch (second_ch) {
+            case 'h': { return check_keyword(scanner, 2, 2, "is", TOKEN_THIS); }
+            case 'r': { return check_keyword(scanner, 2, 2, "ue", TOKEN_TRUE); }
+            }
+        }
+        break;
+    }
+    case 'v': { return check_keyword(scanner, 1, 2, "ar", TOKEN_VAR); }
+    case 'w': { return check_keyword(scanner, 1, 4, "hile", TOKEN_WHILE); }
+    }
+
+    // It's an 'identifier' if the 'keyword' tree above hasn't been resolved and bailed out.
+    return TOKEN_IDENTIFIER;
+}
+
+Token_Type 
+check_keyword(const Scanner *scanner, int32_t start, int32_t length, const char *rest, Token_Type token_type)
+{
+    if (scanner->current-scanner->start == (size_t)(start+length) &&
+        memcmp(scanner->start+start, rest, length) == 0) {
+        return token_type;
+    }
+    return TOKEN_IDENTIFIER;
 }
 
 void skip_whitespaces(Scanner *scanner)
@@ -229,44 +348,6 @@ void skip_whitespaces(Scanner *scanner)
         default: return;
         }
     }
-}
-
-Token parse_string(Scanner *scanner)
-{
-    while (scanner_peek(scanner) != '"' && !scanner_is_end(scanner)) {
-        // NOTE(yemon): Allowing multi-line strings.
-        if (scanner_peek(scanner) == '\n') {
-            scanner->line += 1;
-            scanner_advance(scanner);
-        }
-    }
-
-    if (scanner_is_end(scanner)) {
-        return make_error_token("Unterminated string literal.", scanner->line);
-    }
-
-    // The closing quote.
-    scanner_advance(scanner);
-    return make_token(scanner, TOKEN_STRING);
-}
-
-Token parse_number(Scanner *scanner)
-{
-    while (is_digit(scanner_peek(scanner))) {
-        scanner_advance(scanner);
-    }
-
-    // Look for a fractional point, which could be followed by more numbers.
-    if (scanner_peek(scanner) == '.' && is_digit(scanner_peek_next(scanner))) {
-        // consumes the '.'
-        scanner_advance(scanner);
-
-        while (is_digit(scanner_peek(scanner))) {
-            scanner_advance(scanner);
-        }
-    }
-
-    return make_token(scanner, TOKEN_NUMBER);
 }
 
 char scanner_advance(Scanner *scanner)
